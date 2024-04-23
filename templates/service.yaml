@@ -1,0 +1,23 @@
+{{- if eq "Deployment" .Values.kind -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "splunk.fullname" . }}
+  labels:
+    app: {{ include "splunk.fullname" . }}
+  {{- include "splunk.labels" . | nindent 4 }}
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- range .Values.service.ports }}
+     - name: {{ .name }}
+       port: {{ .port }}
+       targetport: {{ .port }}
+       protocol: {{ .protocol }}
+    {{- end }}
+  selector:
+    app: {{ include "splunk.fullname" . }}
+  {{- include "splunk.selectorLabels" . | nindent 4 }}
+{{- end }}  

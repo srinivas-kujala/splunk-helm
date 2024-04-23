@@ -1,0 +1,43 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: "deployment-server"
+
+service:
+  type: LoadBalancer
+  ports:
+    - name: http # splunk-web
+      port: 8000
+      protocol: TCP
+    - name: https # splunk-api
+      port: 8089
+      protocol: TCP
+
+livenessProbeEnabled: false
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8000
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 40
+  failureThreshold: 1
+
+readinessProbeEnabled: false
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8000
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 40
+  failureThreshold: 1
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80

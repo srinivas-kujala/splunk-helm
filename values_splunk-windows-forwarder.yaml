@@ -1,0 +1,45 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+kind: DaemonSet
+
+image:
+  repository: splunk-forwarder-base
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+nameOverride: "forwarder-win"
+
+service:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 9997
+      protocol: TCP
+
+livenessProbe:
+  exec:
+    command:
+      - powershell
+      - -command
+      - Get-Service "SplunkForwarder*" | Where-Object {$_.Status -eq "Running"}
+
+readinessProbe:
+  exec:
+    command:
+      - powershell
+      - -command
+      - Get-Service "SplunkForwarder*" | Where-Object {$_.Status -eq "Running"}
+
+volumeMounts:
+  - name: temp-volume
+    mountPath: c:\temp\
+
+volumes:
+  - name: temp-volume
+    hostPath:
+      path: c:\temp
+      type: DirectoryOrCreate
+
+nodeSelector:
+  kubernetes.io/os: windows
